@@ -19,8 +19,7 @@ The server runs on port **31415**, so you can access the server at `http://local
 ```json
 {
   "profile": {
-    "handle": "treasurymog",
-    "displayName": "Gladstone, Esq.",
+    "handle": "treasurymog", "displayName": "Gladstone, Esq.",
     "avatarSrc": "/assets/treasurymog-avatar.jpg",
     "bannerSrc": "/assets/treasurymog-banner.jpeg",
     "location": "Whitehall, London",
