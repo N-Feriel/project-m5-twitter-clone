@@ -80,6 +80,8 @@ export const TweetProvider =({children}) =>{
 
     return <TweetContext.Provider 
                 value={{
+                    handleToggleLike,
+                    handleToggleRetweet
                     
                 }}
     >

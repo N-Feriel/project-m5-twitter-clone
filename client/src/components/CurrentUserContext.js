@@ -13,28 +13,25 @@ export const CurrentUserProvider = ({ children }) => {
     // Also, set `status` to `idle`
 
     useEffect(() => {
-        try {
-            fetch('/api/me/profile')
-            .then((res) => res.json())
-            .then((json) =>{
+
+        setStatus('loading')
     
-                const APIStatus = json.status;
-                if (APIStatus === 404) {
-                    console.log('error userContext')
-                    setStatus('error')
-                } else{
-                    setCurrentUser(json.profile)
-                    setStatus('idle')
-                }
-            })
-        } catch(err){
-            setStatus('error')
-        }
+        fetch('/api/me/profile')
+        .then((res) => res.json())
+        .then((json) =>{
+
+            const APIStatus = json.status;
+            if (APIStatus === 404) {
+                console.log('error userContext')
+                setStatus('error')
+            } else{
+                setCurrentUser(json.profile)
+                console.log(json, 'currentUser')
+                setStatus('idle')
+            }
+        })
         
     }, []);
-
-    
-
 
 
     return (

@@ -3,22 +3,19 @@ import styled from 'styled-components';
 import TweetListItem from './TweetListItem';
 
 
+
+
 const TweetList = ({userTweets}) => {
 
-    
-
     const { tweetsById, tweetIds } = userTweets;
-    console.log(userTweets, 'TweetList')
 
-    
     return ( 
         <>
-            
             <ul>
                 {tweetIds.map(tweet =>{
-                    
+
                     return(
-                        <Li key={tweet}>
+                        <Li key={tweet} >
                             <TweetListItem tweet={tweetsById[tweet]} />
                         </Li> 
 
@@ -30,8 +27,8 @@ const TweetList = ({userTweets}) => {
 
 const Li = styled.li`
     list-style-type: none;
+    margin-bottom: 10px;
 `
- 
 
 
 

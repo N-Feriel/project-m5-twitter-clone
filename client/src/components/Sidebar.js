@@ -1,14 +1,20 @@
-import React from 'react';
+import React, {useContext} from 'react';
 
 import { BiHomeAlt, BiBookmark , BiUser} from 'react-icons/bi'
 import {MdNotificationsNone} from 'react-icons/md';
 import styled from 'styled-components';
 import logo from "../assets/logo.svg";
 import NavigationLink from './NavigationLink';
+import {CurrentUserContext} from './CurrentUserContext';
+import { COLORS } from "../constants";
+
 
 
 
 const Sidebar = () => {
+
+    const {currentUser} = useContext(CurrentUserContext);
+
     return ( 
 
     <Wrapper>
@@ -19,9 +25,10 @@ const Sidebar = () => {
 
             <>
                 <NavigationLink route={'/'} iconName= {<BiHomeAlt />} name={'Home'} />
-                <NavigationLink route={"/profileId"} iconName= {<BiUser />} name={'Profile'} />
+                <NavigationLink route={`/${currentUser.handle}`} iconName= {<BiUser />} name={'Profile'} />
                 <NavigationLink route={'/notifications'} iconName= {<MdNotificationsNone />} name={'Notifications'} />
                 <NavigationLink route={'/bookmarks'} iconName= {<BiBookmark />} name={'Bookmarks'} />
+                <Button>Meow</Button>
                 
             </>
             
@@ -33,8 +40,7 @@ const Sidebar = () => {
 
 const Wrapper = styled.div`
 
-    margin: 10px 20px 10px 0;
-    padding: 10px;
+    margin: 50px 30px 0  30px;
 
 `
 
@@ -48,5 +54,16 @@ const Nav = styled.nav`
 
 `
 
+const Button = styled.button`
+    width: 100px;
+    padding: 8px 10px;
+    margin: 20px;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 20px;
+    border: none;
+    background-color: ${COLORS.primary};
+    color: ${COLORS.whiteColor};
+`
 
 export default Sidebar;

@@ -48,8 +48,6 @@ const createTweet = (status, { isRetweet }) => {
 router.get('/api/tweet/:tweetId', (req, res) => {
   let tweet = data.tweets[req.params.tweetId];
 
-  console.log(tweet)
-
   tweet = resolveRetweet(tweet);
   tweet = denormalizeTweet(tweet);
 
@@ -62,6 +60,8 @@ router.get('/api/tweet/:tweetId', (req, res) => {
 router.post('/api/tweet', (req, res) => {
   const newTweet = createTweet(req.body.status, { isRetweet: false });
   data.tweets[newTweet.id] = newTweet;
+  console.log(newTweet, 'new')
+
 
   return simulateProblems(res, { tweet: newTweet });
 });

@@ -4,4 +4,9 @@ export const COLORS = {
 
     secondary: '#dcd0ff',
     // Add more colors as needed!
+
+    whiteColor: '#F8F8FF',
+    grayColor: 'rgb(101, 119, 134)',
+    lightgrayColor: 'rgb(228, 231, 235)',
+    
 };

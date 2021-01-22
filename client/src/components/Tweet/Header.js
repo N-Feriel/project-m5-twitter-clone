@@ -1,18 +1,27 @@
 import React, {useContext} from "react";
 import styled from "styled-components";
-import { TweetContext } from "../TweetContext";
+import { useHistory } from "react-router-dom";
+
 
 const Header = ({user}) => {
 
-    //const { displayName, username, avatarSrc } =  useContext(TweetContext);
+    const history = useHistory();
+
+    const handleProfileDetails = (profileId) =>{
+        console.log(profileId, 'profile')
+        history.push(`/${profileId}`)
+
+    }
+
+    
     return (
-    <Wrapper>
-        <Avatar src={user.avatarSrc} />
-        <Name>
-        <DisplayName>{user.displayName}</DisplayName>
-        <Username>@{user.handle}</Username>
-        </Name>
-    </Wrapper>
+        <Wrapper onClick={() => handleProfileDetails(user.handle)}>
+            <Avatar src={user.avatarSrc} />
+            <Name>
+            <DisplayName>{user.displayName}</DisplayName>
+            <Username>@{user.handle}</Username>
+            </Name>
+        </Wrapper>
     );
 };
 
