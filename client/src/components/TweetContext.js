@@ -1,88 +1,122 @@
-import moment from 'moment';
 import React, { useState } from 'react';
-import { CurrentUserContext } from "./CurrentUserContext";
+import {useLocation} from 'react-router-dom';
 
 
 export const TweetContext = React.createContext(null);
 
 export const TweetProvider =({children}) =>{
 
-    //const date(time) = moment().format('h:mm a - MMM Do, YYYY');
+    const [tweetStatus, settweetStatus ] =useState('loading');
 
-    //var date = moment(time).format("h:mm a - MMM Do, YYYY'")
+    const [userTweets, setUserTweets] = useState([]);
 
-    //const {currentUser} = useContext(CurrentUserContext)
+    const updateUserTweets = (newData) => {
+        setUserTweets({ ...userTweets, ...newData });
+    };
 
-    const [numOfLikes, setNumofLikes]= useState(0);
-    const [numOfRetweets, setNumofRetweets]= useState(0);
-    const [isLiked, setIsLiked] = useState(false);
-    const [isRetweeted, setIsRetweeted] = useState(false);
+    const getHomeFeed =() =>{
 
-    const handleToggleLike = () =>{
-        setIsLiked(!isLiked);
-        console.log('like')
-        !isLiked ? setNumofLikes(numOfLikes + 1) : setNumofLikes(numOfLikes -1);
+        try{
+            fetch(`/api/me/home-feed`)
+            .then((res) => {
+                if(res.status === 200){
+                    return res.json()
+                } else{
+                    settweetStatus('error')
+                }
+            }).then((json) =>{
 
-    }
-
-    const handleToggleRetweet = () =>{
-        setIsRetweeted(!isRetweeted);
-        !isRetweeted ? setNumofRetweets(numOfRetweets + 1) : setNumofRetweets(numOfRetweets -1);
-
-    }
-
-
-   
-    const data = {
-            "id": "1209791721099411456r1",
-            "timestamp": "2019-12-26T14:38:00+00:00",
-            "status": "If you're a 🇬🇧 diplomat abroad today, let me know where you are and what you're up to!",
-            "media": [],
-            "retweetFrom": {
-                "handle": "treasurymog",
-                "displayName": "Gladstone, Esq.",
-                "avatarSrc": "/assets/treasurymog-avatar.jpg",
-                "bannerSrc": "/assets/treasurymog-banner.jpeg",
-                "location": "Whitehall, London",
-                "joined": "2016-10-12T12:00",
-                "bio": "I live and work at the Treasury as a mouser but I also have a paw in the finances. Here to help lighten up the political world. Unofficial.",
-                "numFollowing": 2,
-                "numFollowers": 2,
-                "numLikes": 1,
-                "isFollowingYou": false,
-                "isBeingFollowedByYou": false
-            },
-            "author": {
-                "handle": "diplomog",
-                "displayName": "Palmerston",
-                "avatarSrc": "/assets/diplomog-avatar.jpg",
-                "bannerSrc": "/assets/diplomog-banner.jpeg",
-                "location": "Whitehall",
-                "url": "http://fco.gov.uk",
-                "joined": "2016-02-02T12:00",
-                "bio": "Best friends with @treasurymog.",
-                "numFollowing": 1,
-                "numFollowers": 1,
-                "numLikes": 1,
-                "isFollowingYou": true,
-                "isBeingFollowedByYou": true
-            },
-            "isLiked": false,
-            "isRetweeted": false,
-            "numLikes": 0,
-            "numRetweets": 0
+                console.log(json, 'json')
         
+                    updateUserTweets(json)
+                    settweetStatus('idle')
+                    console.log('tweet', tweetStatus, userTweets)
+            
+            })
+        }
+        catch(error){
+            settweetStatus('error')
+            console.log(error, 'HomeFeed function')
+        }
+        
+    }
+
+    const location = useLocation();
+
+
+
+    const [profileTweetsStatus, setProfileTweetsStatus ] =useState('loading');
+    const [userTweetsProfile, setUserTweetsProfile] = useState([]);
+
+    const updateUserTweetsProfile = (newData) => {
+        setUserTweetsProfile({ ...userTweetsProfile, ...newData });
     };
 
 
 
+    const getProfileFeed = (profileId) =>{
 
+        try{
+            fetch(`/api/${profileId}/feed`)
+            .then((res) => {
+                if(res.status === 200){
+                    return res.json()
+                } else{
+                    setProfileTweetsStatus('error')
+                }
+            })
+            .then((json) =>{    
+                    updateUserTweetsProfile(json);
+                    setProfileTweetsStatus('idle')
+            })
+        } 
+        catch (error){
+            setProfileTweetsStatus('error')
+            console.log(error, 'profile Feed function')
+        }
+
+    }
+
+    const [tweetStatusDetails, setTweetStatusDetails] =useState('loading');
+    const [tweet, setTweet] = useState([]);
+
+
+    const getTweetDetails = (tweetId) =>{
+
+        try{
+            fetch(`/api/tweet/${tweetId}`)
+            .then((res) => {
+                if(res.status === 200){
+                    return res.json()
+                } else{
+                    setTweetStatusDetails('error')
+                }
+            }) 
+            .then((json) =>{
+                setTweet(json.tweet);
+                setTweetStatusDetails('idle');
+                })
+            }
+        catch(error){
+            setTweetStatusDetails('error')
+            console.log(error, 'tweetDtails function')
+        }
+
+    }
 
     return <TweetContext.Provider 
                 value={{
-                    handleToggleLike,
-                    handleToggleRetweet
-                    
+                    getHomeFeed,
+                    tweetStatus,
+                    userTweets,
+                    getProfileFeed,
+                    setProfileTweetsStatus,
+                    profileTweetsStatus, 
+                    userTweetsProfile,
+                    location,
+                    tweetStatusDetails,
+                    getTweetDetails,
+                    tweet,
                 }}
     >
         {children}

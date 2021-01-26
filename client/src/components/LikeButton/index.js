@@ -1,24 +1,27 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from "styled-components";
 
 import Heart from './Heart';
 import AnimateLike from './AnimateLike';
-import {TweetContext} from '../TweetContext'
+import PoppingCircle from './PoppingCircle';
 
 
-const LikeButton = ({size=40}) => {
-    const { isLikedByCurrentUser} =  useContext(TweetContext);
+
+const LikeButton = ({size=40, isLikedByCurrentUser}) => {
+    //const { isLikedByCurrentUser} =  useContext(TweetContext);
 
     const heartSize = size * 0.6;
 
     return ( 
-
         <Wrapper style={{ width: size, height: size }}>
-        {isLikedByCurrentUser ? (
-        <AnimateLike >
-            <Heart width={heartSize} isToggled={isLikedByCurrentUser} />
-        </AnimateLike>
-        ) : <Heart width={heartSize} isToggled={isLikedByCurrentUser} /> }
+
+            {isLikedByCurrentUser && <PoppingCircle size={size} color="#E790F7" />}
+
+            {isLikedByCurrentUser ? (
+            <AnimateLike >
+                <Heart width={heartSize} isToggled={isLikedByCurrentUser} />
+            </AnimateLike>
+            ) : <Heart width={heartSize} isToggled={isLikedByCurrentUser} /> }
     </Wrapper>
 
     );

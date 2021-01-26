@@ -1,5 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import { CurrentUserContext } from "./CurrentUserContext";
+import {TweetContext} from './TweetContext';
 import styled from 'styled-components';
 import {useParams} from "react-router-dom";
 import moment from 'moment';
@@ -7,93 +8,115 @@ import TweetList from './TweetList';
 import {IoLocationOutline} from 'react-icons/io5';
 import {AiOutlineCalendar} from 'react-icons/ai';
 import { COLORS } from "../constants";
+import ErrorPage from './ErrorPage';
+import LoadingPage from './LoadingPage';
+
 
 
 
 
 const Profile = () => {
     
-    //const {currentUser} = useContext(CurrentUserContext);
+    const {currentUser} = useContext(CurrentUserContext);
 
+
+    const {getProfileFeed,
+        setProfileTweetsStatus,
+        profileTweetsStatus,
+        userTweetsProfile} = useContext(TweetContext)
+        
+        
     const [userProfile, setUserProfile] = useState([]);
-
+        
     const [profileStatus, setprofileStatus ] =useState('loading')
-
-    const [userTweets, setUserTweets] = useState([]);
-
+        
+        //const [userTweetsProfile, setUserTweetsProfile] = useState([]);
+        
     const [isTweetsList , setisTweetsList] = useState(false);
+
+    const [isMedia , setisMedia] = useState(false);
+
+    const [islikes , setisLike] = useState(false);
+
+
     const [isBeingFollowedByYou, setIsBeingFollowedByYou] = useState(false);
-
+    
     const [following, setFollowing] =useState({});
-
-    const [followers, setFollowers] =useState({})
-
-
-
-
+    
+    const [followers, setFollowers] =useState({});
+        
     const { profileId } = useParams();
-
-    //console.log('profileId', profileId)
-
+        
     const updateUserProfile = (newData) => {
         //console.log(newData, 'profile')
         setUserProfile({ ...userProfile, ...newData });
     };
 
-    const updateUserTweets = (newData) => {
-        console.log('data', newData)
-        setUserTweets({ ...userTweets, ...newData });
-    };
+
+    // const updateUserTweetsProfile = (newData) => {
+    //     console.log('data', newData)
+    //     setUserTweetsProfile({ ...userTweetsProfile, ...newData });
+    // };
+
+    // console.log(location.pathname, 'ProfileFeed');
 
 
 
 
     useEffect(() => {
-        
-        fetch(`/api/${profileId}/profile`)
-        .then((res) => res.json())
-        .then((json) =>{
-            const APIStatus = json.status; 
-            if (APIStatus === 404) {
-                console.log('error');
-                setprofileStatus('error')
-                
-            } else{
+
+        try{
+            fetch(`/api/${profileId}/profile`)
+            .then((res) =>(res.json()))
+            .then((json) =>{
                 updateUserProfile(json.profile)
                 setIsBeingFollowedByYou(json.profile.isBeingFollowedByYou)
                 setprofileStatus('idle')
-            }
-        })
-
         
+            })
+        } catch(error){
+            setprofileStatus('error')
+            console.log('error in profile page', error);
+        }
         
     }, []);
 
 
-    const GetUserTweets = () =>{
+    const getUserTweets = (e) =>{
 
-        setprofileStatus('loading');
-        setisTweetsList(true);;
-        console.log('getTweets')
+        e.stopPropagation();
 
-        fetch(`/api/${profileId}/feed`)
-            .then((res) => res.json())
-            .then((json) =>{
-                const APIStatus = json.status; 
-                if (APIStatus === 404) {
-                    console.log('error');
-                    setprofileStatus('error')
-
-            } else{
-                updateUserTweets(json);
-                setprofileStatus('idle')
-                
-            }
-        })
+        setProfileTweetsStatus('loading');
+        setisMedia(false);;
+        setisTweetsList(true);
+        getProfileFeed(profileId);
     }
+
+    const getUserMedias = (e) =>{
+
+        e.stopPropagation();
+        setProfileTweetsStatus('loading');
+        setisMedia(true);
+        setisTweetsList(false);
+        getProfileFeed(profileId);
+    }
+
+    const getUserLikes = (e) =>{
+
+        e.stopPropagation();
+        setProfileTweetsStatus('loading');
+        setisLike(true);
+        setisTweetsList(false);
+        setisMedia(false)
+        getProfileFeed(profileId);
+    }
+
+
             
 
     const HandleFolllowing = (ev) =>{
+
+        ev.stopPropagation();
 
         if (isBeingFollowedByYou){
             //console.log('call unFollow')
@@ -130,6 +153,7 @@ const Profile = () => {
     useEffect(() => {
         
         fetch(`/api/${profileId}/following`)
+        
         .then((res) => res.json())
         .then((json) =>{
             const APIStatus = json.status; 
@@ -155,41 +179,41 @@ const Profile = () => {
 
     }, [isBeingFollowedByYou]);
 
-
+    
 
     if(profileStatus === 'loading'){
 
         return (
-            <div>
-                ... is loading
-            </div>
+            <LoadingPage />
         )
     }
     else if(profileStatus === 'error'){
-        
+
         return (
-            <div>
-                ... error
-            </div>
+            <ErrorPage />
         )
 
     }
 
 
     return ( 
-        <Wrapper>
-        <Wrapper>
+        <Wrapper style={{minHeight: '100vh',minWidth: '80vw'}}>
+            
+            <Wrapper>
                 <Banner src={userProfile.bannerSrc} />
-            <DivHeader>
-                <Avatar src={userProfile.avatarSrc} />
-                <Button onClick= {() => HandleFolllowing(userProfile)}>{isBeingFollowedByYou ? "Following" : "Follow"}</Button>
-            </DivHeader>
-            <DivMain>
+                <DivHeader>
+                    <Avatar src={userProfile.avatarSrc} />
+                    {currentUser.handle !== profileId &&
+                        <Button  className={`${isBeingFollowedByYou ? 'active' : ' '}`}
+                            onClick= {(ev) => HandleFolllowing(ev, userProfile)}>{isBeingFollowedByYou ? "Following" : "Follow"}</Button>
+                    }
+                </DivHeader>
+                <DivMain>
 
-                <DisplayName>{userProfile.displayName}</DisplayName>
-                <div style={{display:'flex'}}>
-                    <UserInfo>@{userProfile.handle}</UserInfo>
-                    <span style={{color:`${COLORS.grayColor}`, 
+                    <DisplayName>{userProfile.displayName}</DisplayName>
+                    <div style={{display:'flex'}}>
+                        <UserInfo>@{userProfile.handle}</UserInfo>
+                        <span style={{color:`${COLORS.grayColor}`, 
                                 backgroundColor:`${COLORS.lightgrayColor}`,
                                 marginLeft: '10px',
                                 borderRadius: '5px',
@@ -197,46 +221,62 @@ const Profile = () => {
                                 alignSelf: 'self-start'
                                 }}>
                         {userProfile.isFollowingYou ? "Follows you" : "not Follows you"}</span>
-                </div>
+                    </div>
 
                 <div style={{marginTop: '20px'}}>{userProfile.bio}</div>
 
-                <Div> 
-                    <span>
-                        <IoLocationOutline /> {userProfile.location}
-                    </span>
+                    <Div> 
+                        <span>
+                            <IoLocationOutline /> {userProfile.location}
+                        </span>
 
-                    <span>
-                        <AiOutlineCalendar /> Joined {moment(userProfile.joined).format("MMM, YYYY")}
+                        <span>
+                            <AiOutlineCalendar /> Joined {moment(userProfile.joined).format("MMM, YYYY")}
 
-                    </span>
+                        </span>
 
-                </Div>
+                    </Div>
 
-                <Div>
-                    <span>
-                        <strong>{Object.keys(following).length}</strong> Followings
-                    </span>
-                    <span>
-                        <strong>{Object.keys(followers).length}</strong> Followers
-                    </span>
+                    <Div>
+                        <span>
+                            <strong>{Object.keys(following).length}</strong> Followings
+                        </span>
+                        <span>
+                            <strong>{Object.keys(followers).length}</strong> Followers
+                        </span>
 
-                </Div>
-            </DivMain>
+                    </Div>
+                </DivMain>
 
 
-        </Wrapper>
+            </Wrapper>
 
-        <DivButton>
-            <button onClick= {GetUserTweets} >Tweets</button>
-            <button>Media</button>
-            <button>Likes</button>
-        </DivButton>
+            <DivButton>
+                <button onClick= {(e)=> getUserTweets(e)} >Tweets</button>
+                <button onClick= {(e)=> getUserMedias(e)}>Media</button>
+                <button onClick= {(e)=> getUserLikes(e)}>Likes</button>
+            </DivButton>
 
-            {profileStatus === 'idle' && isTweetsList &&
-                    <TweetList userTweets= {userTweets} />
+            {(isTweetsList || isMedia) && profileTweetsStatus === 'loading' &&
+                <LoadingPage />
             }
 
+            {(isTweetsList || isMedia) && profileTweetsStatus === 'error' &&
+                <ErrorPage />
+            }
+
+            {profileTweetsStatus === 'idle' && isTweetsList &&
+                    <TweetList userTweets= {userTweetsProfile} isTweetsList={isTweetsList} />
+            }
+
+            {profileTweetsStatus === 'idle' && isMedia &&
+                <TweetList userTweets= {userTweetsProfile} isMedia={isMedia}/>
+
+            } 
+            {profileTweetsStatus === 'idle' && islikes &&
+                <TweetList userTweets= {userTweetsProfile} islikes={islikes}/>
+
+            } 
         </Wrapper>
 
     );
@@ -310,9 +350,17 @@ const Button = styled.button`
     font-weight: bold;
     font-size: 18px;
     border-radius: 20px;
-    border: none;
-    background-color: ${COLORS.primary};
-    color: ${COLORS.whiteColor};
+    border: 2px ${COLORS.primary} solid;
+
+    background-color: ${COLORS.whiteColor};
+    color: ${COLORS.primary};
+
+
+    &.active{
+        background-color: ${COLORS.primary};
+        color: ${COLORS.whiteColor};
+        border: none;
+    }
 `
 
 const DivButton = styled.div`

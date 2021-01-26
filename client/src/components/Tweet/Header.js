@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React from "react";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 
@@ -7,19 +7,22 @@ const Header = ({user}) => {
 
     const history = useHistory();
 
-    const handleProfileDetails = (profileId) =>{
-        console.log(profileId, 'profile')
+    const handleProfileDetails = (e, profileId) =>{
+
+        e.stopPropagation();
         history.push(`/${profileId}`)
 
     }
 
     
     return (
-        <Wrapper onClick={() => handleProfileDetails(user.handle)}>
+        <Wrapper  >
             <Avatar src={user.avatarSrc} />
             <Name>
-            <DisplayName>{user.displayName}</DisplayName>
-            <Username>@{user.handle}</Username>
+                <DisplayName tabIndex="0" onClick={(e) => handleProfileDetails(e, user.handle)}>
+                    {user.displayName}
+                </DisplayName>
+                <Username >@{user.handle}</Username>
             </Name>
         </Wrapper>
     );
@@ -48,6 +51,10 @@ const DisplayName = styled.div`
     line-height: 20px;
     margin-right: 10px;
     font-weight: bold;
+
+    :hover{
+        text-decoration: underline;
+    }
 `;
 
 const Username = styled.div`

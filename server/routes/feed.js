@@ -49,6 +49,8 @@ router.get('/api/me/home-feed', (req, res) => {
 router.get('/api/:handle/feed', (req, res) => {
   const { handle } = req.params;
 
+  //console.log('handle', handle)
+
   const tweets = getTweetsFromUser(handle);
 
   const { tweetsById, tweetIds } = formatTweetResponse(tweets);

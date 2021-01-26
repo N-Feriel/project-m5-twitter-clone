@@ -14,22 +14,20 @@ export const CurrentUserProvider = ({ children }) => {
 
     useEffect(() => {
 
-        setStatus('loading')
-    
-        fetch('/api/me/profile')
-        .then((res) => res.json())
-        .then((json) =>{
+        try{
 
-            const APIStatus = json.status;
-            if (APIStatus === 404) {
-                console.log('error userContext')
-                setStatus('error')
-            } else{
+            fetch('/api/me/profile')
+            .then((res) => res.json())
+            .then((json) =>{
                 setCurrentUser(json.profile)
-                console.log(json, 'currentUser')
                 setStatus('idle')
-            }
-        })
+                
+            })
+        }catch(error){
+            console.log('error userContext', error)
+            setStatus('error')
+        }
+    
         
     }, []);
 

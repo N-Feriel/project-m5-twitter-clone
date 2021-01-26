@@ -5,7 +5,8 @@ import TweetListItem from './TweetListItem';
 
 
 
-const TweetList = ({userTweets}) => {
+
+const TweetList = ({userTweets,isTweetsList, isMedia, islikes, isHome}) => {
 
     const { tweetsById, tweetIds } = userTweets;
 
@@ -15,8 +16,26 @@ const TweetList = ({userTweets}) => {
                 {tweetIds.map(tweet =>{
 
                     return(
+
+                        
                         <Li key={tweet} >
-                            <TweetListItem tweet={tweetsById[tweet]} />
+
+                            {isHome &&
+                                    <TweetListItem tweet={tweetsById[tweet]} />
+                            }
+                            {isTweetsList &&
+                                <TweetListItem tweet={tweetsById[tweet]} isMedia={isMedia}/>
+                            }
+
+                            {isMedia && tweetsById[tweet].media.length > 0 &&
+                                    <TweetListItem tweet={tweetsById[tweet]} />
+                            }
+
+                            {islikes && tweetsById[tweet].isLiked &&
+                                    <TweetListItem tweet={tweetsById[tweet]} />
+                            }
+
+
                         </Li> 
 
                     )

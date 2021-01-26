@@ -1,79 +1,70 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect} from 'react';
 import styled from 'styled-components';
 import { COLORS } from "../constants";
 import {useParams} from "react-router-dom";
 import TweetListItem from './TweetListItem';
 import {BsArrowLeft} from 'react-icons/bs';
 import { useHistory } from "react-router-dom";
+import ErrorPage from './ErrorPage';
+import LoadingPage from './LoadingPage';
+import { TweetContext } from './TweetContext';
 
 
 const TweetDetails = () => {
 
+    const {tweet, tweetStatusDetails, getTweetDetails} = useContext(TweetContext)
     
     const { tweetId } = useParams();
-    const [tweet, setTweet] = useState([]);
+    // const [tweet, setTweet] = useState([]);
     const history = useHistory();
-    const [tweetStatus, setTweetStatus] =useState('loading');
+    // const [tweetStatus, setTweetStatus] =useState('loading');
+
 
     useEffect(() => {
-        fetch(`/api/tweet/${tweetId}`)
-        .then((res) => res.json()) 
-        .then((json) =>{
-
-            const APIStatus = json.status; 
-                if (APIStatus === 404) {
-                    console.log('error');
-                    setTweetStatus('error')
-
-            } else{
-                setTweet(json.tweet);
-                setTweetStatus('idle');
-                console.log(json, 'tweet')
-            }
-        })
+        getTweetDetails(tweetId)
         
     }, []);
 
-    const handleClick = () =>{
 
+
+    const handleClick = (e) =>{
+        e.stopPropagation();
         history.push(`/`)
     }
 
-    if(tweetStatus === 'loading'){
+    if(tweetStatusDetails === 'loading'){
 
         return (
-            <div>
-                ... is loading
-            </div>
+            <LoadingPage />
         )
     }
-    else if(tweetStatus === 'error'){
+    else if(tweetStatusDetails === 'error'){
         
         return (
-            <div>
-                ... error
-            </div>
+            <ErrorPage />
         )
 
     }
 
-
+    //console.log(location.pathname, 'tweet Details');
 
     return ( 
-        <Wrapper>
+        <Wrapper tabIndex="0">
         <HeaderDiv>
-            <BsArrowLeft /> <button onClick={handleClick}> Meow</button>
+            <BsArrowLeft /> <button onClick={(ev) => handleClick(ev)}> Meow</button>
 
         </HeaderDiv>
-    
-        <div> 
-            <TweetListItem tweet={tweet} /> 
+        <div > 
+            <TweetListItem tweet={tweet} isBig /> 
         </div> 
         </Wrapper>);
 }
 
 const Wrapper = styled.div`
-    height: fit-content;
+    //height: fit-content;
+    display: flex;
+    flex-direction: column;
+    
 
 `;
 

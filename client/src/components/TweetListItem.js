@@ -5,32 +5,47 @@ import styled from 'styled-components';
 import moment from 'moment';
 import { useHistory } from "react-router-dom";
 
+import {AiOutlineRetweet} from 'react-icons/ai';
+import { COLORS } from '../constants';
 
 
-const TweetListItem = ({tweet}) => {
+
+const TweetListItem = ({tweet, isBig}) => {
 
     const history = useHistory();
 
-
-    const handleTweetDetails = (tweetId) =>{
-        console.log(tweetId, 'tweetId')
+    const handleTweetDetails = (e, tweetId) =>{
+        e.stopPropagation();
         history.push(`/tweet/${tweetId}`)
     }
-    
 
 
     
-    return (<Wrapper>
+    return (<Wrapper tabIndex="0" onClick={(ev)=> handleTweetDetails(ev, tweet.id)}>
+
+        {tweet.retweetFrom && 
+            <div style={{margin: '20px', color:`${COLORS.grayColor}`}}>
+                <AiOutlineRetweet />
+                <span style={{padding: '0 15px'}}>
+                    {tweet.retweetFrom.displayName}
+                </span>
+            </div>
+        }
+
         <DivHeader>
-        <Header  user={tweet.author} />
-        <Timestamp>
-            {moment(tweet.timestamp).format("- MMM Do")}
-        </Timestamp>
+            <Header  user={tweet.author} />
+
+            {!isBig && <>
+                <Timestamp>
+                    {moment(tweet.timestamp).format("- MMM Do")}
+                </Timestamp>
+                </>
+            }
+
         </DivHeader>
 
-
         <DivContent>
-            <TweetContents onClick={()=> handleTweetDetails(tweet.id)}>{tweet.status}</TweetContents>
+            <TweetContents >{tweet.status}</TweetContents>
 
             {tweet.media &&
 
@@ -42,9 +57,29 @@ const TweetListItem = ({tweet}) => {
 
             }
 
-            <ActionBar />
+            {isBig && <div style={{ margin:'0 20px'}}>
+                <Timestamp>
+                    {moment(tweet.timestamp).format("h:mm a - MMM Do, YYYY")}
+                </Timestamp>
+
+                <div style={{display: 'flex',
+                    margin:'20px 0' }}>
+                    <div style={{ marginRight:'20px' }}>
+                        <strong>{tweet.numLikes} </strong> Likes 
+                    </div>
+                    <div>
+                        <strong>{tweet.numRetweets} </strong> Retweets  
+                    </div>
+                </div>
+            </div>
+            }
+
+            <ActionBar tweet= {tweet} 
+                    showNumberOfLikes={!isBig} 
+                    showNumberOfRetweets={!isBig} />
         </DivContent>
-            <Divider />
+        
+        <Divider />
 
         
     </Wrapper>  );

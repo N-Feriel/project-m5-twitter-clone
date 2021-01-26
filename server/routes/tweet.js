@@ -60,9 +60,6 @@ router.get('/api/tweet/:tweetId', (req, res) => {
 router.post('/api/tweet', (req, res) => {
   const newTweet = createTweet(req.body.status, { isRetweet: false });
   data.tweets[newTweet.id] = newTweet;
-  console.log(newTweet, 'new')
-
-
   return simulateProblems(res, { tweet: newTweet });
 });
 
@@ -73,6 +70,9 @@ router.put('/api/tweet/:tweetId/like', (req, res) => {
   const { like } = req.body;
 
   const tweet = data.tweets[req.params.tweetId];
+
+  //console.log('req', req.body)
+  //console.log(tweet, 'like');
 
   if (!tweet) {
     res.sendStatus(404);
@@ -86,7 +86,6 @@ router.put('/api/tweet/:tweetId/like', (req, res) => {
     return;
   }
 
-  console.log(tweet);
 
   // Disallow "repeat" requests (eg trying to like an already-liked tweet).
   const currentlyLiked = tweet.likedBy.includes(CURRENT_USER_HANDLE);

@@ -4,101 +4,112 @@ import TweetList from './TweetList';
 
 import {CurrentUserContext} from './CurrentUserContext';
 import { COLORS } from "../constants";
+import { TweetContext } from './TweetContext';
+import AnimationLoad from './AnimationLoad';
+
+import ErrorPage from './ErrorPage';
+import LoadingPage from './LoadingPage';
 
 const HomeFeed = () => {
     const {currentUser} = useContext(CurrentUserContext);
 
-    const [userTweets, setUserTweets] = useState([]);
-
-    const [tweetStatus, settweetStatus ] =useState('loading');
+    const {getHomeFeed , tweetStatus, userTweets, location} = useContext(TweetContext)
 
     const [newTweetStatus, setNewTweetStatus ] =useState('loading');
 
     const [addOpacity, setAddOpacity] = useState(false);
 
-    const [remainingSpaceTweet, setRemainingSpaceTweet] =useState(280);
+    const maxSpace = 280;
 
+    const [remainingSpaceTweet, setRemainingSpaceTweet] =useState(maxSpace);
 
+    const [warnningSpace, setWarnningSpace] =useState('');
+
+    const [isDisabled, setIsDisabled] = useState(false);
 
     const initialValue = "What's happining? ";
 
     const [valueTweet, setvalueTweet] = useState(initialValue);
 
-    const updateUserTweets = (newData) => {
-        setUserTweets({ ...userTweets, ...newData });
-    };
+    // const updateUserTweets = (newData) => {
+    //     setUserTweets({ ...userTweets, ...newData });
+    // };
 
     const HandleChange = (event) =>{
         setAddOpacity(true);
         setvalueTweet(event)
-        setRemainingSpaceTweet(280 - event.length);
+        setRemainingSpaceTweet(maxSpace - event.length);
 
+        if(remainingSpaceTweet > 55 && remainingSpaceTweet < maxSpace ){
+            setWarnningSpace('')
+        }
+
+        else if(remainingSpaceTweet <= 55 && remainingSpaceTweet > 0){
+            setWarnningSpace('warning')
+            setIsDisabled(false)
+
+        } else if(remainingSpaceTweet < 0){
+            setWarnningSpace('danger')
+            setIsDisabled(true)
+        }
     }
+
+
+    // console.log(location.pathname, 'HomeFeed');
 
     const HandleSubmit = (ev) =>{
 
         setNewTweetStatus('loading');
 
-        fetch(`/api/tweet`, {
-            method: "POST",
-            body: JSON.stringify({status: ev}),
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-        })
-        
-        .then((res) =>{
-            //console.log(json, 'res json')
-            const APIStatus = res.status 
-            if (APIStatus === 404) {
-                setNewTweetStatus('error')
-                console.log('error', APIStatus);
-                
-            } else{
+        if(remainingSpaceTweet > 0){
 
-                //res.json().then(res => (console.log(res)))
-                setNewTweetStatus('succes');
-                setvalueTweet(initialValue);
-                setAddOpacity(false);
-            }
-        })
+            fetch(`/api/tweet`, {
+                method: "POST",
+                body: JSON.stringify({status: ev}),
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+            })
+            
+            .then((res) =>{
+                console.log(res, 'res json')
+                const APIStatus = res.status 
+                if (APIStatus === 404) {
+                    setNewTweetStatus('error')
+                    console.log('error', APIStatus);
+                    
+                } else{
+                    //res.json().then(res => (console.log(res)))
+                    setNewTweetStatus('success');
+                    setvalueTweet(initialValue);
+                    setAddOpacity(false);
+                }
+            })
+        }
+        
 
     }
 
-    useEffect(() => {        
-        fetch(`/api/me/home-feed`)
-        .then((res) => res.json())
-        .then((json) =>{
-            const APIStatus = json.status; 
-            if (APIStatus === 404) {
-                console.log('error');
-                settweetStatus('error')
-                
-            } else{
-                updateUserTweets(json)
-                settweetStatus('idle')
-            }
-        })
+
+    useEffect(() => {    
+
+        getHomeFeed()
         
     }, [newTweetStatus]);
 
     
     if(tweetStatus === 'loading'){
 
-        console.log('load', userTweets)
         return (
-            <div>
-                ... is loading
-            </div>
+            <LoadingPage />
+
         )
     }
     else if(tweetStatus === 'error' || newTweetStatus === 'error'){
         
         return (
-            <div>
-                ... error
-            </div>
+            <ErrorPage />
         )
 
     }
@@ -108,26 +119,31 @@ const HomeFeed = () => {
         return ( 
     
             <Wrapper>
-                <div >
+
+                <div>
                     <Header> Home </Header>
                     <TweetPost className= {addOpacity ? 'isFocus' : ''}> 
                         <div style={{display:'flex', alignSelf:'flex-start'}}>
                             <Avatar src={currentUser.avatarSrc} />
                             <label htmlFor={valueTweet} />
-                            <Input
+                            <Input  id={valueTweet} 
+                                rows= "8"
+                                cols='100'
                                 type='text'
                                 name= 'newTweet'
                                 onChange={(ev) => HandleChange(ev.target.value)}
                                 value={valueTweet}
-                                />
+                            />
+                    
                         </div>
                         <div  style={{display:'flex', alignSelf:'flex-end'}}>
-                            <div style={{alignSelf:'center'}}>{remainingSpaceTweet}</div>
-                            <Button  onClick={() =>HandleSubmit(valueTweet)} >Meow</Button>
+                            <DivRemaining className={`${warnningSpace}`}>{remainingSpaceTweet}</DivRemaining>
+                            <Button  className={`${isDisabled ? 'disable' : ''}`}
+                                onClick={() =>HandleSubmit(valueTweet)} >Meow</Button>
                         </div>
                     </TweetPost>
                 </div>
-                <TweetList userTweets= {userTweets} />
+                <TweetList userTweets= {userTweets}  isHome/>
         
             </Wrapper>        
         )
@@ -151,15 +167,11 @@ const Header = styled.h1`
 
 `
 
-const Input = styled.input`
+const Input = styled.textarea`
     border: none;
-    height: 200px;
-    width: 600px;
     margin: 10px;
     text-align: top;
     padding: 10px;
-
-
 `
 
 const Avatar = styled.img`
@@ -197,6 +209,24 @@ const Button = styled.button`
     border: none;
     background-color: ${COLORS.primary};
     color: ${COLORS.whiteColor};
+
+    &.disable{
+        opacity: 0.1;
+    }
+
+`
+
+const DivRemaining = styled.div`
+    align-self: center;
+
+    &.warning{
+        color: orange;
+    }
+
+    &.danger{
+        color: red;
+    }
+
 `
 
 export default HomeFeed;

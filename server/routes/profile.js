@@ -17,7 +17,7 @@ const {
 router.get('/api/me/profile', (req, res) => {
   const profile = getUserProfile(CURRENT_USER_HANDLE);
 
-  console.log('res', res)
+  //console.log('res', res)
 
   return simulateProblems(res, { profile });
 

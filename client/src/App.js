@@ -8,14 +8,16 @@ import Profile from "./components/Profile";
 import TweetDetails from "./components/TweetDetails";
 import GlobalStyles from "./components/GlobalStyles";
 import Sidebar from "./components/Sidebar";
-import {TweetProvider} from "./components/TweetContext";
+
 import {CurrentUserContext} from './components/CurrentUserContext';
 import { COLORS } from "./constants";
+import { TweetProvider } from "./components/TweetContext";
 
 
 function App() {
 
   const {status} = useContext(CurrentUserContext);
+
 
   return (
     <BrowserRouter>
@@ -26,35 +28,31 @@ function App() {
         <Wrapper>
           <Sidebar />
 
-          <Main>
-            <Switch>
-              <Route exact path="/">
-              <TweetProvider>
-                <HomeFeed />
-              </TweetProvider>
-              </Route>
+          <TweetProvider>
+            <Main >
+              <Switch>
+                <Route exact path="/">
+                  <HomeFeed />
+                </Route>
 
-              <Route exact path="/notifications" >
-                <Notifications />
-              </Route>
+                <Route exact path="/notifications" >
+                  <Notifications />
+                </Route>
 
-              <Route exact path="/bookmarks" >
-                <Bookmarks />
-              </Route>
+                <Route exact path="/bookmarks" >
+                  <Bookmarks />
+                </Route>
 
-              <Route exact path="/tweet/:tweetId" >
-                <TweetProvider>
-                  <TweetDetails />
-                </TweetProvider>
-              </Route>
-
-              <Route exact path="/:profileId" >
-              <TweetProvider>
-                <Profile />
-              </TweetProvider>
-              </Route>
-            </Switch>
-          </Main>
+                <Route exact path="/tweet/:tweetId" >
+                    <TweetDetails />
+                </Route>
+                
+                <Route exact path="/:profileId" >
+                  <Profile />
+                </Route>
+              </Switch>
+            </Main>
+          </TweetProvider>
         </Wrapper>
   }
     </BrowserRouter>
