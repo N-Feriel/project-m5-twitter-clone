@@ -11,7 +11,13 @@ const Header = ({user}) => {
 
         e.stopPropagation();
         history.push(`/${profileId}`)
+    }
 
+    const handleKeyPress = (event, userId) => {
+        if(event.key === 'Enter'){
+            console.log('enter press here! ')
+            handleProfileDetails(event, userId)
+        }
     }
 
     
@@ -19,7 +25,7 @@ const Header = ({user}) => {
         <Wrapper  >
             <Avatar src={user.avatarSrc} />
             <Name>
-                <DisplayName tabIndex="0" onClick={(e) => handleProfileDetails(e, user.handle)}>
+                <DisplayName tabIndex="0" onKeyUp={(ev) => handleKeyPress(ev, user.handle)} onClick={(e) => handleProfileDetails(e, user.handle)}>
                     {user.displayName}
                 </DisplayName>
                 <Username >@{user.handle}</Username>

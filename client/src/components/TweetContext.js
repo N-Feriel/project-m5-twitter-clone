@@ -16,28 +16,24 @@ export const TweetProvider =({children}) =>{
 
     const getHomeFeed =() =>{
 
-        try{
-            fetch(`/api/me/home-feed`)
-            .then((res) => {
-                if(res.status === 200){
-                    return res.json()
-                } else{
-                    settweetStatus('error')
-                }
-            }).then((json) =>{
+        fetch(`/api/me/home-feed`)
+        .then((res) => {
+            if(res.status === 200){
+                return res.json()
+            } else{
+                throw(res)
+            }
+        }).then((json) =>{
 
-                console.log(json, 'json')
+            console.log(json, 'json')
+            updateUserTweets(json)
+            settweetStatus('idle')
+            console.log('tweet', tweetStatus, userTweets)
         
-                    updateUserTweets(json)
-                    settweetStatus('idle')
-                    console.log('tweet', tweetStatus, userTweets)
-            
-            })
-        }
-        catch(error){
+        }).catch((error) =>{    
             settweetStatus('error')
-            console.log(error, 'HomeFeed function')
-        }
+            console.log(error, 'home Feed function')
+        })
         
     }
 
@@ -56,25 +52,23 @@ export const TweetProvider =({children}) =>{
 
     const getProfileFeed = (profileId) =>{
 
-        try{
-            fetch(`/api/${profileId}/feed`)
-            .then((res) => {
-                if(res.status === 200){
-                    return res.json()
-                } else{
-                    setProfileTweetsStatus('error')
-                }
-            })
-            .then((json) =>{    
-                    updateUserTweetsProfile(json);
-                    setProfileTweetsStatus('idle')
-            })
-        } 
-        catch (error){
+        fetch(`/api/${profileId}/feed`)
+        .then((res) => {
+            if(res.status === 200){
+                return res.json()
+            } else{
+                throw(res)
+            }
+        })
+        .then((json) =>{    
+                updateUserTweetsProfile(json);
+                setProfileTweetsStatus('idle')
+        })
+        .catch((error) =>{    
             setProfileTweetsStatus('error')
             console.log(error, 'profile Feed function')
-        }
-
+        })
+        
     }
 
     const [tweetStatusDetails, setTweetStatusDetails] =useState('loading');
@@ -83,25 +77,23 @@ export const TweetProvider =({children}) =>{
 
     const getTweetDetails = (tweetId) =>{
 
-        try{
-            fetch(`/api/tweet/${tweetId}`)
-            .then((res) => {
-                if(res.status === 200){
-                    return res.json()
-                } else{
-                    setTweetStatusDetails('error')
-                }
-            }) 
-            .then((json) =>{
-                setTweet(json.tweet);
-                setTweetStatusDetails('idle');
-                })
+        fetch(`/api/tweet/${tweetId}`)
+        .then((res) => {
+            if(res.status === 200){
+                return res.json()
+            } else{
+                throw(res)
             }
-        catch(error){
-            setTweetStatusDetails('error')
-            console.log(error, 'tweetDtails function')
-        }
-
+        }) 
+        .then((json) =>{
+            setTweet(json.tweet);
+            setTweetStatusDetails('idle');
+            })
+        .catch((error) =>{    
+            setProfileTweetsStatus('error')
+            console.log(error, 'tweet details function')
+        })
+    
     }
 
     return <TweetContext.Provider 

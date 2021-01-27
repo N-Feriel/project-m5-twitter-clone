@@ -14,14 +14,21 @@ const TweetListItem = ({tweet, isBig}) => {
 
     const history = useHistory();
 
-    const handleTweetDetails = (e, tweetId) =>{
-        e.stopPropagation();
+    const handleTweetDetails = (tweetId) =>{
+        //e.stopPropagation();
         history.push(`/tweet/${tweetId}`)
     }
 
+    const handleKeyPress = (event, tweetId) => {
+        if(event.key === 'Enter'){
+            console.log('enter press here! ')
+            handleTweetDetails(tweetId)
+        }
+    }
 
     
-    return (<Wrapper tabIndex="0" onClick={(ev)=> handleTweetDetails(ev, tweet.id)}>
+    return (<Wrapper tabIndex="0" onKeyUp ={(ev) => handleKeyPress(ev, tweet.id)} 
+                    onClick={()=> handleTweetDetails(tweet.id)}>
 
         {tweet.retweetFrom && 
             <div style={{margin: '20px', color:`${COLORS.grayColor}`}}>

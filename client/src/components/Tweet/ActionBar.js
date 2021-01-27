@@ -101,7 +101,7 @@ const ActionBar = ({tweet, showNumberOfLikes, showNumberOfRetweets}) => {
 
     return (
     <Wrapper>
-        <Action color="rgb(27, 149, 224)" size={40}>
+        <Action color="rgb(27, 149, 224)" size={40} onClick={(e) => e.stopPropagation()}>
             <TweetActionIcon kind="reply" />
         </Action>
 
@@ -122,7 +122,7 @@ const ActionBar = ({tweet, showNumberOfLikes, showNumberOfRetweets}) => {
             }
             
         </Action>
-        <Action color="rgb(27, 149, 224)" size={40}>
+        <Action color="rgb(27, 149, 224)" size={40} onClick={(e) => e.stopPropagation()}>
             <TweetActionIcon kind="share" />
         </Action>
     </Wrapper>
